@@ -1,0 +1,7 @@
+{
+  "generatorName": "typescript-nodejs",
+  "answers": {
+    "destination": "/Users/alarner/projects/larner-dev-api",
+    "name": "@larner.dev/api"
+  }
+}
