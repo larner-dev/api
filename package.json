@@ -47,5 +47,8 @@
     "mime-types": "2.1.35",
     "path-to-regexp": "6.2.1"
   },
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "publishConfig": {
+    "access": "public"
+  }
 }
