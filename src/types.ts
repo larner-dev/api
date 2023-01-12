@@ -4,110 +4,121 @@ import { Key } from "path-to-regexp";
 import Koa from "koa";
 import { ParsedUrlQuery } from "querystring";
 
-export type JSONPrimitive_T = string | number | boolean | null;
-export type JSONValue_T = JSONPrimitive_T | JSONObject_T | JSONArray_T;
-export type JSONObject_T = { [member: string]: JSONValue_T };
-export type JSONArray_T = Array<JSONValue_T>;
+export type LAPIJSONPrimitive = string | number | boolean | null;
+export type LAPIJSONValue = LAPIJSONPrimitive | LAPIJSONObject | LAPIJSONArray;
+export type LAPIJSONObject = { [member: string]: LAPIJSONValue };
+export type LAPIJSONArray = Array<LAPIJSONValue>;
 
-export interface StringValueObject_T {
+export interface LAPIStringValueObject {
   [key: string]: string;
 }
 
-export interface Bootstrap_T {
-  config: Config_T;
+export interface LAPIBootstrap {
+  config: LAPIValidatedConfig;
   handleRequest: (
-    method: Method_T,
+    method: LAPIMethod,
     requestUrl: string,
-    body: JSONValue_T,
+    body: LAPIJSONValue,
     rawBody: string,
     headers: IncomingHttpHeaders
   ) => Promise<unknown>;
 }
 
-export interface Server_T {
+export interface LAPIServer {
   app: Koa<Koa.DefaultState, Koa.DefaultContext>;
   instance: Server;
+  config: LAPIValidatedConfig;
 }
 
-export interface Config_T {
+type DeepPartial<T> = T extends object
+  ? {
+      [P in keyof T]?: DeepPartial<T[P]>;
+    }
+  : T;
+
+export interface LAPIValidatedConfig {
   rootDirectory: string;
   routes: {
     directory: string;
     excludeRegex?: string;
   };
-  public?: {
+  static?: {
     directory: string;
   };
-  server?: {
-    url: string;
+  server: {
     cors?: Options;
     debug?: boolean;
-    port?: number;
-    index?: string;
+    port: number;
+    index: string;
   };
 }
 
-export type Method_T = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+export interface LAPIConfig
+  extends Omit<DeepPartial<LAPIValidatedConfig>, "rootDirectory"> {
+  rootDirectory: string;
+}
 
-export interface RouteMetadata_T<T extends Context = Context> {
-  method: Method_T;
+export type LAPIMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+
+export interface LAPIRouteMetadata<T extends LAPIContext = LAPIContext> {
+  method: LAPIMethod;
   pattern: string;
   keys: Key[];
   regexp: RegExp;
-  fns: RouteHandler_T<T>[];
-  middleware: RouteHandler_T<T>[];
+  fns: LAPIRouteHandler<T>[];
+  middleware: LAPIRouteHandler<T>[];
 }
 
-export interface Context<B = JSONValue_T> {
+export interface LAPIContext<B = LAPIJSONValue> {
   query: ParsedUrlQuery;
-  params: StringValueObject_T;
+  params: LAPIStringValueObject;
   body: B;
   headers: IncomingHttpHeaders;
   rawBody: string;
 }
 
-export type RouteHandler_T<T extends Context> = (
+export type LAPIRouteHandler<T extends LAPIContext> = (
   context: T
-) => Promise<JSONValue_T>;
+) => Promise<LAPIJSONValue>;
 
-export interface ModelMethods_T {
+export interface LAPIModelMethods {
   [key: string]: () => unknown;
 }
 
-export interface TestRequest_T {
+export interface LAPITestRequest {
   get: (
     path: string,
-    query?: StringValueObject_T,
-    headers?: StringValueObject_T
+    query?: LAPIStringValueObject,
+    headers?: LAPIStringValueObject
   ) => Promise<unknown>;
   post: (
     path: string,
-    body?: JSONValue_T,
-    headers?: StringValueObject_T
+    body?: LAPIJSONValue,
+    headers?: LAPIStringValueObject
   ) => Promise<unknown>;
   put: (
     path: string,
-    body?: JSONValue_T,
-    headers?: StringValueObject_T
+    body?: LAPIJSONValue,
+    headers?: LAPIStringValueObject
   ) => Promise<unknown>;
   patch: (
     path: string,
-    body?: JSONValue_T,
-    headers?: StringValueObject_T
+    body?: LAPIJSONValue,
+    headers?: LAPIStringValueObject
   ) => Promise<unknown>;
   delete: (
     path: string,
-    body?: JSONValue_T,
-    headers?: StringValueObject_T
+    body?: LAPIJSONValue,
+    headers?: LAPIStringValueObject
   ) => Promise<unknown>;
 }
 
-export interface TestHelpers_T extends TestRequest_T {
+export interface LAPITestHelpers extends LAPITestRequest {
   handleRequest: (
-    method: Method_T,
+    method: LAPIMethod,
     requestUrl: string,
-    body: JSONValue_T,
+    body: LAPIJSONValue,
     rawBody: string,
-    headers: StringValueObject_T
+    headers: LAPIStringValueObject
   ) => Promise<unknown>;
 }

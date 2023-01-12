@@ -1,31 +1,56 @@
-import { Config_T } from "./types";
+import { LAPIConfig, LAPIValidatedConfig } from "./types";
 import path from "path";
 
-export const configBuilder = (config: Config_T): Config_T => {
-  if (!config.routes || !config.routes.directory) {
-    throw new Error("config.routes.directory is required");
+export const configBuilder = (config: LAPIConfig): LAPIValidatedConfig => {
+  const finalConfig = <LAPIValidatedConfig>{ ...config };
+
+  // Set defaults
+  if (!finalConfig.routes) {
+    finalConfig.routes = {
+      directory: "./routes",
+    };
+  }
+  if (!finalConfig.routes.directory) {
+    finalConfig.routes.directory = "./routes";
   }
 
-  if (!path.isAbsolute(config.routes.directory)) {
-    config.routes.directory = path.join(
-      config.rootDirectory,
-      config.routes.directory
+  if (!finalConfig.server) {
+    finalConfig.server = {
+      port: 4444,
+      index: "index",
+    };
+  }
+
+  if (!finalConfig.server.port) {
+    finalConfig.server.port = 4444;
+  }
+
+  if (!finalConfig.server.index) {
+    finalConfig.server.index = "index";
+  }
+
+  if (finalConfig.static && !finalConfig.static.directory) {
+    finalConfig.static.directory = "static";
+  }
+
+  // Standardize paths
+  if (!path.isAbsolute(finalConfig.routes.directory)) {
+    finalConfig.routes.directory = path.join(
+      finalConfig.rootDirectory,
+      finalConfig.routes.directory
     );
   }
 
   if (
-    config.public &&
-    config.public.directory &&
-    !path.isAbsolute(config.routes.directory)
+    finalConfig.static &&
+    finalConfig.static.directory &&
+    !path.isAbsolute(finalConfig.static.directory)
   ) {
-    config.public.directory = path.join(
-      config.rootDirectory,
-      config.public.directory
+    finalConfig.static.directory = path.join(
+      finalConfig.rootDirectory,
+      finalConfig.static.directory
     );
   }
 
-  if (config.server && !config.server.index) {
-    config.server.index = "index";
-  }
-  return config;
+  return finalConfig;
 };

@@ -1,7 +1,13 @@
 import Koa from "koa";
 
 import { HTTPRedirect } from "@larner.dev/perk-response-codes";
-import { Config_T, Context, JSONValue_T, Method_T, Server_T } from "./types";
+import {
+  LAPIConfig,
+  LAPIContext,
+  LAPIJSONValue,
+  LAPIMethod,
+  LAPIServer,
+} from "./types";
 import { bootstrap } from "./bootstrap";
 import { ReadStream } from "fs";
 import { contentType } from "mime-types";
@@ -9,23 +15,23 @@ import cors from "@koa/cors";
 import bodyParser from "koa-bodyparser";
 import { basename } from "path";
 
-export const server = async <T extends Context>(
-  config: Config_T
-): Promise<Server_T> => {
-  const { handleRequest } = await bootstrap<T>(config);
+export const server = async <T extends LAPIContext = LAPIContext>(
+  config: LAPIConfig
+): Promise<LAPIServer> => {
+  const { handleRequest, config: validatedConfig } = await bootstrap<T>(config);
 
   // Start the server
   const app = new Koa();
   app.use(bodyParser({ enableTypes: ["json"] }));
-  if (config?.server?.cors) {
-    app.use(cors(config.server.cors));
+  if (validatedConfig.server.cors) {
+    app.use(cors(validatedConfig.server.cors));
   }
   app.use(async (ctx) => {
     try {
       const result = await handleRequest(
-        ctx.request.method as Method_T,
+        ctx.request.method as LAPIMethod,
         ctx.request.url,
-        ctx.request.body as JSONValue_T,
+        ctx.request.body as LAPIJSONValue,
         ctx.request.rawBody,
         ctx.request.header
       );
@@ -51,7 +57,7 @@ export const server = async <T extends Context>(
         ctx.response.status = error.status;
         ctx.body = { code: error.message };
       } else {
-        if (config.server?.debug) {
+        if (validatedConfig.server.debug) {
           // eslint-disable-next-line no-console
           console.error(error);
         }
@@ -60,6 +66,6 @@ export const server = async <T extends Context>(
       }
     }
   });
-  const instance = app.listen((config.server && config.server.port) || 3000);
-  return { app, instance };
+  const instance = app.listen(validatedConfig.server.port);
+  return { app, instance, config: validatedConfig };
 };
