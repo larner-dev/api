@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "npm run build-cjs && npm run build-esm && npm run build-types",
-    "build-cjs": "esbuild src/index.ts --bundle --platform=node --target=node14 --outdir=build/cjs  --packages=external --format=cjs",
-    "build-esm": "esbuild src/index.ts --bundle --platform=node --target=node14 --outdir=build/esm  --packages=external --format=esm",
+    "build-cjs": "esbuild src/index.ts --bundle --platform=node --target=node16 --outdir=build/cjs  --packages=external --format=cjs",
+    "build-esm": "esbuild src/index.ts --bundle --platform=node --target=node16 --outdir=build/esm  --packages=external --format=esm",
     "build-types": "tsc --project tsconfig.json --declaration --emitDeclarationOnly --outdir build/types",
     "dev": "npm run build-esm -- --watch",
     "format": "prettier --write \"src/**/*.ts\"",
@@ -43,7 +43,6 @@
     "@types/koa__cors": "3.3.0",
     "@types/koa-bodyparser": "4.3.10",
     "@types/node": "18.11.18",
-    "dotenv": "16.0.3",
     "koa": "2.14.1",
     "koa-bodyparser": "4.3.0",
     "mime-types": "2.1.35",
