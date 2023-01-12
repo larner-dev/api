@@ -12,6 +12,9 @@
     "dev": "npm run build-esm -- --watch",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint .",
+    "postversion": "git push && git push --tags",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test",
     "test": "jest"
   },
   "exports": {
