@@ -14,6 +14,7 @@ import {
   StringValueObject_T,
 } from "./types";
 import { createReadStream, promises } from "fs";
+import { resolve } from "path";
 
 export const bootstrap = async <T extends Context>(
   config: Config_T
@@ -137,7 +138,11 @@ export const bootstrap = async <T extends Context>(
               return createReadStream(p);
             }
           } catch (error) {
-            if (!["ENOENT"].includes(error.code)) {
+            if (
+              error &&
+              (error as Record<string, unknown>).code &&
+              !["ENOENT"].includes((error as Record<string, string>).code)
+            ) {
               throw error;
             }
           }

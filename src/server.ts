@@ -21,7 +21,6 @@ export const server = async <T extends Context>(
     app.use(cors(config.server.cors));
   }
   app.use(async (ctx) => {
-    const x = "foo";
     try {
       const result = await handleRequest(
         ctx.request.method as Method_T,
@@ -44,12 +43,15 @@ export const server = async <T extends Context>(
         error &&
         typeof error === "object" &&
         "isHTTPError" in error &&
+        "status" in error &&
+        typeof error.status === "number" &&
+        "message" in error &&
         error.isHTTPError
       ) {
         ctx.response.status = error.status;
         ctx.body = { code: error.message };
       } else {
-        if (config.server.debug) {
+        if (config.server?.debug) {
           // eslint-disable-next-line no-console
           console.error(error);
         }
