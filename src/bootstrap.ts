@@ -99,7 +99,6 @@ export const bootstrap = async <T extends LAPIContext>(
       }
     }
   }
-  console.log(routes);
 
   return {
     async handleRequest(ctx: Koa.ParameterizedContext): Promise<unknown> {
