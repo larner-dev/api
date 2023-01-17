@@ -1,3 +1,4 @@
+import { ExtendableContext, ParameterizedContext } from "koa";
 import querystring from "querystring";
 import { bootstrap } from "./index";
 import {
@@ -19,13 +20,13 @@ export const bootstrapTests = async (
       query: LAPIStringValueObject = {},
       headers: LAPIStringValueObject = {}
     ): Promise<unknown> {
-      const result = await handleRequest(
-        "GET",
-        `${path}?${querystring.stringify(query)}`,
-        {},
-        "",
-        headers
-      );
+      const result = await handleRequest({
+        method: "GET",
+        path: `${path}?${querystring.stringify(query)}`,
+        body: {},
+        rawBody: "",
+        headers,
+      } as unknown as ParameterizedContext);
       return JSON.parse(JSON.stringify(result));
     },
     async post(
@@ -33,13 +34,13 @@ export const bootstrapTests = async (
       body: LAPIJSONValue = {},
       headers: LAPIStringValueObject = {}
     ): Promise<unknown> {
-      const result = await handleRequest(
-        "POST",
+      const result = await handleRequest({
+        method: "POST",
         path,
         body,
-        JSON.stringify(body),
-        headers
-      );
+        rawBody: JSON.stringify(body),
+        headers,
+      } as unknown as ParameterizedContext);
       return JSON.parse(JSON.stringify(result));
     },
     async put(
@@ -47,13 +48,13 @@ export const bootstrapTests = async (
       body: LAPIJSONValue = {},
       headers: LAPIStringValueObject = {}
     ): Promise<unknown> {
-      const result = await handleRequest(
-        "PUT",
+      const result = await handleRequest({
+        method: "PUT",
         path,
         body,
-        JSON.stringify(body),
-        headers
-      );
+        rawBody: JSON.stringify(body),
+        headers,
+      } as unknown as ParameterizedContext);
       return JSON.parse(JSON.stringify(result));
     },
     async patch(
@@ -61,13 +62,13 @@ export const bootstrapTests = async (
       body: LAPIJSONValue = {},
       headers: LAPIStringValueObject = {}
     ): Promise<unknown> {
-      const result = await handleRequest(
-        "PATCH",
+      const result = await handleRequest({
+        method: "PATCH",
         path,
         body,
-        JSON.stringify(body),
-        headers
-      );
+        rawBody: JSON.stringify(body),
+        headers,
+      } as unknown as ParameterizedContext);
       return JSON.parse(JSON.stringify(result));
     },
     async delete(
@@ -75,13 +76,13 @@ export const bootstrapTests = async (
       body: LAPIJSONValue = {},
       headers: LAPIStringValueObject = {}
     ): Promise<unknown> {
-      const result = await handleRequest(
-        "DELETE",
+      const result = await handleRequest({
+        method: "DELETE",
         path,
         body,
-        JSON.stringify(body),
-        headers
-      );
+        rawBody: JSON.stringify(body),
+        headers,
+      } as unknown as ParameterizedContext);
       return JSON.parse(JSON.stringify(result));
     },
   };

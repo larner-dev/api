@@ -1,4 +1,5 @@
 import url from "url";
+import Koa from "koa";
 import querystring from "querystring";
 import { HTTPError } from "@larner.dev/perk-response-codes";
 import { Key, pathToRegexp } from "path-to-regexp";
@@ -73,7 +74,15 @@ export const bootstrap = async <T extends LAPIContext>(
         if (suffix.startsWith("/")) {
           suffix = suffix.substring(1);
         }
-        const pattern = "/" + [prefix, suffix].filter((v) => v).join("/");
+        const pieces = [prefix, suffix];
+        if (validatedConfig.routes.globalPrefix) {
+          let { globalPrefix } = validatedConfig.routes;
+          if (globalPrefix.startsWith("/")) {
+            globalPrefix = globalPrefix.substring(1);
+          }
+          pieces.unshift(globalPrefix);
+        }
+        const pattern = "/" + pieces.filter((v) => v).join("/");
         const keys: Key[] = [];
         const regexp = pathToRegexp(pattern, keys);
         const fns = Array.isArray(endpoints[key])
@@ -90,15 +99,15 @@ export const bootstrap = async <T extends LAPIContext>(
       }
     }
   }
+  console.log(routes);
 
   return {
-    async handleRequest(
-      method: LAPIMethod,
-      requestUrl: string,
-      body: LAPIJSONValue,
-      rawBody: string,
-      headers: IncomingHttpHeaders
-    ): Promise<unknown> {
+    async handleRequest(ctx: Koa.ParameterizedContext): Promise<unknown> {
+      const method = ctx.request.method as LAPIMethod;
+      const requestUrl = ctx.request.url;
+      const body = ctx.request.body as LAPIJSONValue;
+      const rawBody = ctx.request.rawBody;
+      const headers: IncomingHttpHeaders = ctx.request.header;
       const { pathname, query } = url.parse(requestUrl);
       const parsedQuery = querystring.parse(query || "");
       let matchedRoute: LAPIRouteMetadata<T> | null = null;
@@ -128,10 +137,10 @@ export const bootstrap = async <T extends LAPIContext>(
         let result: LAPIJSONValue = null;
 
         for (const fn of matchedRoute.middleware) {
-          result = await fn(context as T);
+          result = await fn(context as T, ctx);
         }
         for (const fn of matchedRoute.fns) {
-          result = await fn(context as T);
+          result = await fn(context as T, ctx);
         }
         return result;
       } else {

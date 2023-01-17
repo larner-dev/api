@@ -13,15 +13,13 @@ export interface LAPIStringValueObject {
   [key: string]: string;
 }
 
+export type LAPIApp = Koa;
+
+type HandleRequestFn = (ctx: Koa.ParameterizedContext) => Promise<unknown>;
+
 export interface LAPIBootstrap {
   config: LAPIValidatedConfig;
-  handleRequest: (
-    method: LAPIMethod,
-    requestUrl: string,
-    body: LAPIJSONValue,
-    rawBody: string,
-    headers: IncomingHttpHeaders
-  ) => Promise<unknown>;
+  handleRequest: HandleRequestFn;
 }
 
 export interface LAPIServer {
@@ -39,6 +37,7 @@ type DeepPartial<T> = T extends object
 export interface LAPIValidatedConfig {
   rootDirectory: string;
   routes: {
+    globalPrefix?: string;
     directory: string;
     excludeRegex?: string;
   };
@@ -78,7 +77,8 @@ export interface LAPIContext<B = LAPIJSONValue> {
 }
 
 export type LAPIRouteHandler<T extends LAPIContext> = (
-  context: T
+  context: T,
+  rawContext: Koa.ParameterizedContext
 ) => Promise<LAPIJSONValue>;
 
 export interface LAPIModelMethods {
@@ -114,11 +114,5 @@ export interface LAPITestRequest {
 }
 
 export interface LAPITestHelpers extends LAPITestRequest {
-  handleRequest: (
-    method: LAPIMethod,
-    requestUrl: string,
-    body: LAPIJSONValue,
-    rawBody: string,
-    headers: LAPIStringValueObject
-  ) => Promise<unknown>;
+  handleRequest: HandleRequestFn;
 }

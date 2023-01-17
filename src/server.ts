@@ -2,6 +2,7 @@ import Koa from "koa";
 
 import { HTTPRedirect } from "@larner.dev/perk-response-codes";
 import {
+  LAPIApp,
   LAPIConfig,
   LAPIContext,
   LAPIJSONValue,
@@ -16,7 +17,8 @@ import bodyParser from "koa-bodyparser";
 import { basename } from "path";
 
 export const server = async <T extends LAPIContext = LAPIContext>(
-  config: LAPIConfig
+  config: LAPIConfig,
+  injectMiddleware?: (app: LAPIApp) => void
 ): Promise<LAPIServer> => {
   const { handleRequest, config: validatedConfig } = await bootstrap<T>(config);
 
@@ -26,15 +28,12 @@ export const server = async <T extends LAPIContext = LAPIContext>(
   if (validatedConfig.server.cors) {
     app.use(cors(validatedConfig.server.cors));
   }
+  if (injectMiddleware) {
+    injectMiddleware(app);
+  }
   app.use(async (ctx) => {
     try {
-      const result = await handleRequest(
-        ctx.request.method as LAPIMethod,
-        ctx.request.url,
-        ctx.request.body as LAPIJSONValue,
-        ctx.request.rawBody,
-        ctx.request.header
-      );
+      const result = await handleRequest(ctx);
       if (result instanceof HTTPRedirect) {
         ctx.status = result.status;
         ctx.redirect(result.location);
