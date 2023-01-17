@@ -1,7 +1,7 @@
 import url from "url";
 import Koa from "koa";
 import querystring from "querystring";
-import { HTTPError } from "@larner.dev/perk-response-codes";
+import { HTTPError } from "@larner.dev/http-codes";
 import { Key, pathToRegexp } from "path-to-regexp";
 import { IncomingHttpHeaders } from "http";
 import { configBuilder } from "./configBuilder";

@@ -1,5 +1,5 @@
-export { HTTPError } from "@larner.dev/perk-response-codes";
-export { HTTPRedirect } from "@larner.dev/perk-response-codes";
+export { HTTPError } from "@larner.dev/http-codes";
+export { HTTPRedirect } from "@larner.dev/http-codes";
 export { server } from "./server";
 export { configBuilder } from "./configBuilder";
 export { bootstrap } from "./bootstrap";

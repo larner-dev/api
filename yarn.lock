@@ -746,12 +746,15 @@
   dependencies:
     vary "^1.1.2"
 
-"@larner.dev/perk-response-codes@1.0.0":
+"@larner.dev/http-codes@1.0.0":
   version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@larner.dev/perk-response-codes/-/perk-response-codes-1.0.0.tgz#a6adc4051196680b60a10a8cc1b3cf3e5c647b0c"
-  integrity sha512-SLJCqscFAKpTKN5pqHN7KMJEIUM+0i6udk17hncWmNuuSRVPoXqVIMcsJoqZCfMVmH1uc68+T/92CUYK0upUYw==
+  resolved "https://registry.yarnpkg.com/@larner.dev/http-codes/-/http-codes-1.0.0.tgz#0808825e5eb1ae0339dd89fd35bcc7b16832de4d"
+  integrity sha512-YJECcQmQU68cpbrhjZ/x2aoCvVKL51JdxNdaDqmuy0t1RBjuSt1onEP+dh/9xxxVp2EGzmAvumWQ30oSDjBaAQ==
   dependencies:
-    "@types/node" "18.11.5"
+    "@types/jest" "29.2.5"
+    "@types/node" "18.11.18"
+    "@typescript-eslint/eslint-plugin" "5.48.1"
+    "@typescript-eslint/parser" "5.48.1"
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -985,11 +988,6 @@
   version "18.11.18"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-18.11.18.tgz#8dfb97f0da23c2293e554c5a50d61ef134d7697f"
   integrity sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==
-
-"@types/node@18.11.5":
-  version "18.11.5"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.11.5.tgz#1bc94cf2f9ab5fe33353bc7c79c797dcc5325bef"
-  integrity sha512-3JRwhbjI+cHLAkUorhf8RnqUbFXajvzX4q6fMn5JwkgtuwfYtRQYI3u4V92vI6NJuTsbBQWWh3RZjFsuevyMGQ==
 
 "@types/prettier@^2.1.5":
   version "2.7.2"
@@ -1756,11 +1754,6 @@ doctrine@^3.0.0:
   integrity sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==
   dependencies:
     esutils "^2.0.2"
-
-dotenv@16.0.3:
-  version "16.0.3"
-  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.0.3.tgz#115aec42bac5053db3c456db30cc243a5a836a07"
-  integrity sha512-7GO6HghkA5fYG9TYnNxi14/7K9f5occMlp3zXAuSxn7CKCxt9xbNWG7yF8hTCSUchlfWSe3uLmlPfigevRItzQ==
 
 ee-first@1.1.1:
   version "1.1.1"

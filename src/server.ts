@@ -1,14 +1,7 @@
 import Koa from "koa";
 
-import { HTTPRedirect } from "@larner.dev/perk-response-codes";
-import {
-  LAPIApp,
-  LAPIConfig,
-  LAPIContext,
-  LAPIJSONValue,
-  LAPIMethod,
-  LAPIServer,
-} from "./types";
+import { HTTPRedirect } from "@larner.dev/http-codes";
+import { LAPIApp, LAPIConfig, LAPIContext, LAPIServer } from "./types";
 import { bootstrap } from "./bootstrap";
 import { ReadStream } from "fs";
 import { contentType } from "mime-types";
