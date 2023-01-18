@@ -1,6 +1,10 @@
 import * as Koa from "koa";
-export { HTTPError } from "@larner.dev/http-codes";
-export { HTTPRedirect } from "@larner.dev/http-codes";
+export {
+  HTTPError,
+  HTTPRedirect,
+  isHTTPError,
+  HTTPErrorCode,
+} from "@larner.dev/http-codes";
 export { server } from "./server";
 export { configBuilder } from "./configBuilder";
 export { bootstrap } from "./bootstrap";

@@ -746,10 +746,10 @@
   dependencies:
     vary "^1.1.2"
 
-"@larner.dev/http-codes@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@larner.dev/http-codes/-/http-codes-1.0.0.tgz#0808825e5eb1ae0339dd89fd35bcc7b16832de4d"
-  integrity sha512-YJECcQmQU68cpbrhjZ/x2aoCvVKL51JdxNdaDqmuy0t1RBjuSt1onEP+dh/9xxxVp2EGzmAvumWQ30oSDjBaAQ==
+"@larner.dev/http-codes@1.4.2":
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/@larner.dev/http-codes/-/http-codes-1.4.2.tgz#cf794f39d90ebcc217bf5aa3bc7e417d87b21ff1"
+  integrity sha512-y8NgFRfTdlvWc95+cMYv1jMRD3LDfOP90Qwht8rz4bKQBt0vCDV7rEZItloBULI9+7pVQSCZ3rj711utU7HY/Q==
   dependencies:
     "@types/jest" "29.2.5"
     "@types/node" "18.11.18"
