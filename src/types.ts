@@ -4,7 +4,7 @@ import Koa from "koa";
 import { ParsedUrlQuery } from "querystring";
 import { HTTPRedirect } from "@larner.dev/http-codes";
 
-type JSONPrimitive = string | number | boolean | null;
+type JSONPrimitive = string | number | boolean | Date | null;
 type JSONObject = { [member: string]: JSONValue };
 type JSONArray = Array<JSONValue>;
 export type JSONValue = JSONPrimitive | JSONObject | JSONArray;
@@ -70,6 +70,6 @@ export type MiddlewareHandler<C1 extends Context = Context, C2 = {}> = (
 
 export type Routes<C1 extends Context, C2> =
   | Record<string, RouteHandler<C1, C2>>
-  | Record<"middleware", RouteHandler<C1, C2>[]>
+  | Record<"middleware", MiddlewareHandler<C1, C2>[]>
   | Record<"prefix", string>
   | Record<"suffix", string>;

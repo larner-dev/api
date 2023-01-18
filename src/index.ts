@@ -10,6 +10,7 @@ export {
   Routes,
   RouteHandler,
   MiddlewareHandler,
+  JSONValue,
 } from "./types";
 export * as helpers from "./helpers";
 
