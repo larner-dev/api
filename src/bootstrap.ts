@@ -1,26 +1,26 @@
 import url from "url";
 import Koa from "koa";
 import querystring from "querystring";
-import { HTTPError } from "@larner.dev/http-codes";
+import { HTTPError, HTTPRedirect } from "@larner.dev/http-codes";
 import { Key, pathToRegexp } from "path-to-regexp";
 import { IncomingHttpHeaders } from "http";
 import { configBuilder } from "./configBuilder";
 import {
-  LAPIBootstrap,
-  LAPIConfig,
-  LAPIContext,
-  LAPIJSONValue,
-  LAPIMethod,
-  LAPIRouteMetadata,
-  LAPIStringValueObject,
+  BootstrapLAPI,
+  ConfigLAPI,
+  ContextLAPI,
+  JSONValueLAPI,
+  MethodLAPI,
+  RouteMetadataLAPI,
+  StringValueObjectLAPI,
 } from "./types";
 import { createReadStream } from "fs";
-import { extname, resolve } from "path";
+import { extname, join, resolve } from "path";
 import { readdir, stat } from "fs/promises";
 
-export const bootstrap = async <T extends LAPIContext>(
-  config: LAPIConfig
-): Promise<LAPIBootstrap> => {
+export const bootstrap = async <T extends ContextLAPI>(
+  config: ConfigLAPI
+): Promise<BootstrapLAPI> => {
   // Validate config and fix paths
   const validatedConfig = configBuilder(config);
 
@@ -43,7 +43,7 @@ export const bootstrap = async <T extends LAPIContext>(
     });
   }
 
-  const routes: LAPIRouteMetadata<T>[] = [];
+  const routes: RouteMetadataLAPI<T>[] = [];
   for (const routePath of routePaths) {
     if (routePath.match("^.+.m?[jt]s")) {
       const route = routePath.substring(
@@ -58,7 +58,11 @@ export const bootstrap = async <T extends LAPIContext>(
         endpoints = endpoints.default;
       }
       const middleware = endpoints.middleware || [];
-      const keys = Object.keys(endpoints).filter((k) => k !== "middleware");
+      const endpointsPrefix = endpoints.prefix || "";
+      const endpointsSuffix = endpoints.suffix || "";
+      const keys = Object.keys(endpoints).filter(
+        (k) => !["middleware", "prefix", "suffix"].includes(k)
+      );
       for (const key of keys) {
         const [method, subPattern] = key.split(" ");
         if (!["GET", "POST", "PUT", "PATCH", "DELETE"].includes(method)) {
@@ -66,7 +70,7 @@ export const bootstrap = async <T extends LAPIContext>(
             `Endpoint "${key}" in route "${routePath}" does not start with a valid request type (GET, POST, PUT, PATCH or DELETE)`
           );
         }
-        let prefix = route;
+        let prefix = join(endpointsPrefix, route, endpointsSuffix);
         let suffix = subPattern;
         if (prefix === validatedConfig.server.index) {
           prefix = "";
@@ -89,7 +93,7 @@ export const bootstrap = async <T extends LAPIContext>(
           ? endpoints[key]
           : [endpoints[key]];
         routes.push({
-          method: method as LAPIMethod,
+          method: method as MethodLAPI,
           pattern,
           regexp,
           keys,
@@ -102,14 +106,14 @@ export const bootstrap = async <T extends LAPIContext>(
 
   return {
     async handleRequest(ctx: Koa.ParameterizedContext): Promise<unknown> {
-      const method = ctx.request.method as LAPIMethod;
+      const method = ctx.request.method as MethodLAPI;
       const requestUrl = ctx.request.url;
-      const body = ctx.request.body as LAPIJSONValue;
+      const body = ctx.request.body as JSONValueLAPI;
       const rawBody = ctx.request.rawBody;
       const headers: IncomingHttpHeaders = ctx.request.header;
       const { pathname, query } = url.parse(requestUrl);
       const parsedQuery = querystring.parse(query || "");
-      let matchedRoute: LAPIRouteMetadata<T> | null = null;
+      let matchedRoute: RouteMetadataLAPI<T> | null = null;
       let match: RegExpExecArray | null = null;
 
       for (const route of routes) {
@@ -122,18 +126,18 @@ export const bootstrap = async <T extends LAPIContext>(
         }
       }
       if (match && matchedRoute) {
-        const params: LAPIStringValueObject = {};
+        const params: StringValueObjectLAPI = {};
         for (let i = 0; i < matchedRoute.keys.length; i++) {
           params[matchedRoute.keys[i].name] = match[i + 1];
         }
-        const context: LAPIContext = {
+        const context: ContextLAPI = {
           query: parsedQuery,
           params,
           body,
           rawBody,
           headers,
         };
-        let result: LAPIJSONValue = null;
+        let result: JSONValueLAPI | HTTPRedirect = null;
 
         for (const fn of matchedRoute.middleware) {
           result = await fn(context as T, ctx);

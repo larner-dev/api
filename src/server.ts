@@ -1,7 +1,7 @@
 import Koa from "koa";
 
 import { HTTPRedirect } from "@larner.dev/http-codes";
-import { LAPIApp, LAPIConfig, LAPIContext, LAPIServer } from "./types";
+import { AppLAPI, ConfigLAPI, ContextLAPI, ServerLAPI } from "./types";
 import { bootstrap } from "./bootstrap";
 import { ReadStream } from "fs";
 import { contentType } from "mime-types";
@@ -9,10 +9,10 @@ import cors from "@koa/cors";
 import bodyParser from "koa-bodyparser";
 import { basename } from "path";
 
-export const server = async <T extends LAPIContext = LAPIContext>(
-  config: LAPIConfig,
-  injectMiddleware?: (app: LAPIApp) => void
-): Promise<LAPIServer> => {
+export const server = async <T extends ContextLAPI = ContextLAPI>(
+  config: ConfigLAPI,
+  injectMiddleware?: (app: AppLAPI) => void
+): Promise<ServerLAPI> => {
   const { handleRequest, config: validatedConfig } = await bootstrap<T>(config);
 
   // Start the server

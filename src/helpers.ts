@@ -2,23 +2,23 @@ import { ExtendableContext, ParameterizedContext } from "koa";
 import querystring from "querystring";
 import { bootstrap } from "./index";
 import {
-  LAPIConfig,
-  LAPITestHelpers,
-  LAPIStringValueObject,
-  LAPIJSONValue,
+  ConfigLAPI,
+  TestHelpersLAPI,
+  StringValueObjectLAPI,
+  JSONValueLAPI,
 } from "./types";
 
 export const bootstrapTests = async (
-  config: LAPIConfig
-): Promise<LAPITestHelpers> => {
+  config: ConfigLAPI
+): Promise<TestHelpersLAPI> => {
   const { handleRequest } = await bootstrap(config);
 
   return {
     handleRequest,
     async get(
       path: string,
-      query: LAPIStringValueObject = {},
-      headers: LAPIStringValueObject = {}
+      query: StringValueObjectLAPI = {},
+      headers: StringValueObjectLAPI = {}
     ): Promise<unknown> {
       const result = await handleRequest({
         method: "GET",
@@ -31,8 +31,8 @@ export const bootstrapTests = async (
     },
     async post(
       path: string,
-      body: LAPIJSONValue = {},
-      headers: LAPIStringValueObject = {}
+      body: JSONValueLAPI = {},
+      headers: StringValueObjectLAPI = {}
     ): Promise<unknown> {
       const result = await handleRequest({
         method: "POST",
@@ -45,8 +45,8 @@ export const bootstrapTests = async (
     },
     async put(
       path: string,
-      body: LAPIJSONValue = {},
-      headers: LAPIStringValueObject = {}
+      body: JSONValueLAPI = {},
+      headers: StringValueObjectLAPI = {}
     ): Promise<unknown> {
       const result = await handleRequest({
         method: "PUT",
@@ -59,8 +59,8 @@ export const bootstrapTests = async (
     },
     async patch(
       path: string,
-      body: LAPIJSONValue = {},
-      headers: LAPIStringValueObject = {}
+      body: JSONValueLAPI = {},
+      headers: StringValueObjectLAPI = {}
     ): Promise<unknown> {
       const result = await handleRequest({
         method: "PATCH",
@@ -73,8 +73,8 @@ export const bootstrapTests = async (
     },
     async delete(
       path: string,
-      body: LAPIJSONValue = {},
-      headers: LAPIStringValueObject = {}
+      body: JSONValueLAPI = {},
+      headers: StringValueObjectLAPI = {}
     ): Promise<unknown> {
       const result = await handleRequest({
         method: "DELETE",
