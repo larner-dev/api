@@ -1,18 +1,23 @@
 import Koa from "koa";
 
 import { HTTPRedirect } from "@larner.dev/http-codes";
-import { AppLAPI, ConfigLAPI, ContextLAPI, ServerLAPI } from "./types";
+import { Config, Context, ValidatedConfig } from "./types";
 import { bootstrap } from "./bootstrap";
 import { ReadStream } from "fs";
 import { contentType } from "mime-types";
 import cors from "@koa/cors";
 import bodyParser from "koa-bodyparser";
 import { basename } from "path";
+import { Server } from "http";
 
-export const server = async <T extends ContextLAPI = ContextLAPI>(
-  config: ConfigLAPI,
-  injectMiddleware?: (app: AppLAPI) => void
-): Promise<ServerLAPI> => {
+export const server = async <T extends Context = Context>(
+  config: Config,
+  injectMiddleware?: (app: Koa) => void
+): Promise<{
+  app: Koa<Koa.DefaultState, Koa.DefaultContext>;
+  instance: Server;
+  config: ValidatedConfig;
+}> => {
   const { handleRequest, config: validatedConfig } = await bootstrap<T>(config);
 
   // Start the server

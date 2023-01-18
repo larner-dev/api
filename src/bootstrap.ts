@@ -6,21 +6,36 @@ import { Key, pathToRegexp } from "path-to-regexp";
 import { IncomingHttpHeaders } from "http";
 import { configBuilder } from "./configBuilder";
 import {
-  BootstrapLAPI,
-  ConfigLAPI,
-  ContextLAPI,
-  JSONValueLAPI,
-  MethodLAPI,
-  RouteMetadataLAPI,
-  StringValueObjectLAPI,
+  Config,
+  Context,
+  HandleRequestFn,
+  JSONValue,
+  Method,
+  RouteHandler,
+  StringValueObject,
+  ValidatedConfig,
 } from "./types";
 import { createReadStream } from "fs";
 import { extname, join, resolve } from "path";
 import { readdir, stat } from "fs/promises";
 
-export const bootstrap = async <T extends ContextLAPI>(
-  config: ConfigLAPI
-): Promise<BootstrapLAPI> => {
+interface Bootstrap {
+  config: ValidatedConfig;
+  handleRequest: HandleRequestFn;
+}
+
+interface RouteMetadata<T extends Context = Context> {
+  method: Method;
+  pattern: string;
+  keys: Key[];
+  regexp: RegExp;
+  fns: RouteHandler<T>[];
+  middleware: RouteHandler<T>[];
+}
+
+export const bootstrap = async <T extends Context>(
+  config: Config
+): Promise<Bootstrap> => {
   // Validate config and fix paths
   const validatedConfig = configBuilder(config);
 
@@ -43,7 +58,7 @@ export const bootstrap = async <T extends ContextLAPI>(
     });
   }
 
-  const routes: RouteMetadataLAPI<T>[] = [];
+  const routes: RouteMetadata<T>[] = [];
   for (const routePath of routePaths) {
     if (routePath.match("^.+.m?[jt]s")) {
       const route = routePath.substring(
@@ -93,7 +108,7 @@ export const bootstrap = async <T extends ContextLAPI>(
           ? endpoints[key]
           : [endpoints[key]];
         routes.push({
-          method: method as MethodLAPI,
+          method: method as Method,
           pattern,
           regexp,
           keys,
@@ -106,14 +121,14 @@ export const bootstrap = async <T extends ContextLAPI>(
 
   return {
     async handleRequest(ctx: Koa.ParameterizedContext): Promise<unknown> {
-      const method = ctx.request.method as MethodLAPI;
+      const method = ctx.request.method as Method;
       const requestUrl = ctx.request.url;
-      const body = ctx.request.body as JSONValueLAPI;
+      const body = ctx.request.body as JSONValue;
       const rawBody = ctx.request.rawBody;
       const headers: IncomingHttpHeaders = ctx.request.header;
       const { pathname, query } = url.parse(requestUrl);
       const parsedQuery = querystring.parse(query || "");
-      let matchedRoute: RouteMetadataLAPI<T> | null = null;
+      let matchedRoute: RouteMetadata<T> | null = null;
       let match: RegExpExecArray | null = null;
 
       for (const route of routes) {
@@ -126,18 +141,18 @@ export const bootstrap = async <T extends ContextLAPI>(
         }
       }
       if (match && matchedRoute) {
-        const params: StringValueObjectLAPI = {};
+        const params: StringValueObject = {};
         for (let i = 0; i < matchedRoute.keys.length; i++) {
           params[matchedRoute.keys[i].name] = match[i + 1];
         }
-        const context: ContextLAPI = {
+        const context: Context = {
           query: parsedQuery,
           params,
           body,
           rawBody,
           headers,
         };
-        let result: JSONValueLAPI | HTTPRedirect = null;
+        let result: JSONValue | HTTPRedirect = null;
 
         for (const fn of matchedRoute.middleware) {
           result = await fn(context as T, ctx);

@@ -1,8 +1,8 @@
-import { ConfigLAPI, ValidatedConfigLAPI } from "./types";
+import { Config, ValidatedConfig } from "./types";
 import path from "path";
 
-export const configBuilder = (config: ConfigLAPI): ValidatedConfigLAPI => {
-  const finalConfig = <ValidatedConfigLAPI>{ ...config };
+export const configBuilder = (config: Config): ValidatedConfig => {
+  const finalConfig = <ValidatedConfig>{ ...config };
 
   // Set defaults
   if (!finalConfig.routes) {

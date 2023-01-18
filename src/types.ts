@@ -1,35 +1,23 @@
 import { Options } from "@koa/cors";
 import { IncomingHttpHeaders, Server } from "http";
-import { Key } from "path-to-regexp";
 import Koa from "koa";
 import { ParsedUrlQuery } from "querystring";
 import { HTTPRedirect } from "@larner.dev/http-codes";
 
-export type JSONPrimitiveLAPI = string | number | boolean | null;
-export type JSONValueLAPI = JSONPrimitiveLAPI | JSONObjectLAPI | JSONArrayLAPI;
-export type JSONObjectLAPI = { [member: string]: JSONValueLAPI };
-export type JSONArrayLAPI = Array<JSONValueLAPI>;
+type JSONPrimitive = string | number | boolean | null;
+type JSONObject = { [member: string]: JSONValue };
+type JSONArray = Array<JSONValue>;
+export type JSONValue = JSONPrimitive | JSONObject | JSONArray;
 
-export interface StringValueObjectLAPI {
+export interface StringValueObject {
   [key: string]: string;
 }
 
-export type AppLAPI = Koa;
-
 export type ParameterizedContext = Koa.ParameterizedContext;
 
-type HandleRequestFn = (ctx: Koa.ParameterizedContext) => Promise<unknown>;
-
-export interface BootstrapLAPI {
-  config: ValidatedConfigLAPI;
-  handleRequest: HandleRequestFn;
-}
-
-export interface ServerLAPI {
-  app: Koa<Koa.DefaultState, Koa.DefaultContext>;
-  instance: Server;
-  config: ValidatedConfigLAPI;
-}
+export type HandleRequestFn = (
+  ctx: Koa.ParameterizedContext
+) => Promise<unknown>;
 
 type DeepPartial<T> = T extends object
   ? {
@@ -37,7 +25,7 @@ type DeepPartial<T> = T extends object
     }
   : T;
 
-export interface ValidatedConfigLAPI {
+export interface ValidatedConfig {
   rootDirectory: string;
   routes: {
     globalPrefix?: string;
@@ -55,73 +43,33 @@ export interface ValidatedConfigLAPI {
   };
 }
 
-export interface ConfigLAPI
-  extends Omit<DeepPartial<ValidatedConfigLAPI>, "rootDirectory"> {
+export interface Config
+  extends Omit<DeepPartial<ValidatedConfig>, "rootDirectory"> {
   rootDirectory: string;
 }
 
-export type MethodLAPI = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+export type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
-export interface RouteMetadataLAPI<T extends ContextLAPI = ContextLAPI> {
-  method: MethodLAPI;
-  pattern: string;
-  keys: Key[];
-  regexp: RegExp;
-  fns: RouteHandlerLAPI<T>[];
-  middleware: RouteHandlerLAPI<T>[];
-}
-
-export interface ContextLAPI<B = JSONValueLAPI> {
+export interface Context<B = JSONValue> {
   query: ParsedUrlQuery;
-  params: StringValueObjectLAPI;
+  params: StringValueObject;
   body: B;
   headers: IncomingHttpHeaders;
   rawBody: string;
 }
 
-export type RouteHandlerLAPI<C1 extends ContextLAPI, C2 = {}> = (
+export type RouteHandler<C1 extends Context = Context, C2 = {}> = (
   context: C1,
   rawContext: Koa.ParameterizedContext & C2
-) => Promise<JSONValueLAPI | HTTPRedirect>;
+) => Promise<JSONValue | HTTPRedirect>;
 
-export interface LAPIModelMethods {
-  [key: string]: () => unknown;
-}
+export type MiddlewareHandler<C1 extends Context = Context, C2 = {}> = (
+  context: C1,
+  rawContext: Koa.ParameterizedContext & C2
+) => Promise<void>;
 
-export interface TestRequestLAPI {
-  get: (
-    path: string,
-    query?: StringValueObjectLAPI,
-    headers?: StringValueObjectLAPI
-  ) => Promise<unknown>;
-  post: (
-    path: string,
-    body?: JSONValueLAPI,
-    headers?: StringValueObjectLAPI
-  ) => Promise<unknown>;
-  put: (
-    path: string,
-    body?: JSONValueLAPI,
-    headers?: StringValueObjectLAPI
-  ) => Promise<unknown>;
-  patch: (
-    path: string,
-    body?: JSONValueLAPI,
-    headers?: StringValueObjectLAPI
-  ) => Promise<unknown>;
-  delete: (
-    path: string,
-    body?: JSONValueLAPI,
-    headers?: StringValueObjectLAPI
-  ) => Promise<unknown>;
-}
-
-export interface TestHelpersLAPI extends TestRequestLAPI {
-  handleRequest: HandleRequestFn;
-}
-
-export type RoutesLAPI<C1 extends ContextLAPI, C2> =
-  | Record<string, RouteHandlerLAPI<C1, C2>>
-  | Record<"middleware", RouteHandlerLAPI<C1, C2>[]>
+export type Routes<C1 extends Context, C2> =
+  | Record<string, RouteHandler<C1, C2>>
+  | Record<"middleware", RouteHandler<C1, C2>[]>
   | Record<"prefix", string>
   | Record<"suffix", string>;

@@ -1,24 +1,46 @@
-import { ExtendableContext, ParameterizedContext } from "koa";
+import { ParameterizedContext } from "koa";
 import querystring from "querystring";
 import { bootstrap } from "./index";
-import {
-  ConfigLAPI,
-  TestHelpersLAPI,
-  StringValueObjectLAPI,
-  JSONValueLAPI,
-} from "./types";
+import { Config, StringValueObject, JSONValue, HandleRequestFn } from "./types";
 
-export const bootstrapTests = async (
-  config: ConfigLAPI
-): Promise<TestHelpersLAPI> => {
+interface TestHelpers {
+  get: (
+    path: string,
+    query?: StringValueObject,
+    headers?: StringValueObject
+  ) => Promise<unknown>;
+  post: (
+    path: string,
+    body?: JSONValue,
+    headers?: StringValueObject
+  ) => Promise<unknown>;
+  put: (
+    path: string,
+    body?: JSONValue,
+    headers?: StringValueObject
+  ) => Promise<unknown>;
+  patch: (
+    path: string,
+    body?: JSONValue,
+    headers?: StringValueObject
+  ) => Promise<unknown>;
+  delete: (
+    path: string,
+    body?: JSONValue,
+    headers?: StringValueObject
+  ) => Promise<unknown>;
+  handleRequest: HandleRequestFn;
+}
+
+export const bootstrapTests = async (config: Config): Promise<TestHelpers> => {
   const { handleRequest } = await bootstrap(config);
 
   return {
     handleRequest,
     async get(
       path: string,
-      query: StringValueObjectLAPI = {},
-      headers: StringValueObjectLAPI = {}
+      query: StringValueObject = {},
+      headers: StringValueObject = {}
     ): Promise<unknown> {
       const result = await handleRequest({
         method: "GET",
@@ -31,8 +53,8 @@ export const bootstrapTests = async (
     },
     async post(
       path: string,
-      body: JSONValueLAPI = {},
-      headers: StringValueObjectLAPI = {}
+      body: JSONValue = {},
+      headers: StringValueObject = {}
     ): Promise<unknown> {
       const result = await handleRequest({
         method: "POST",
@@ -45,8 +67,8 @@ export const bootstrapTests = async (
     },
     async put(
       path: string,
-      body: JSONValueLAPI = {},
-      headers: StringValueObjectLAPI = {}
+      body: JSONValue = {},
+      headers: StringValueObject = {}
     ): Promise<unknown> {
       const result = await handleRequest({
         method: "PUT",
@@ -59,8 +81,8 @@ export const bootstrapTests = async (
     },
     async patch(
       path: string,
-      body: JSONValueLAPI = {},
-      headers: StringValueObjectLAPI = {}
+      body: JSONValue = {},
+      headers: StringValueObject = {}
     ): Promise<unknown> {
       const result = await handleRequest({
         method: "PATCH",
@@ -73,8 +95,8 @@ export const bootstrapTests = async (
     },
     async delete(
       path: string,
-      body: JSONValueLAPI = {},
-      headers: StringValueObjectLAPI = {}
+      body: JSONValue = {},
+      headers: StringValueObject = {}
     ): Promise<unknown> {
       const result = await handleRequest({
         method: "DELETE",
