@@ -1,8 +1,9 @@
 import { Options } from "@koa/cors";
-import { IncomingHttpHeaders, Server } from "http";
+import { IncomingHttpHeaders } from "http";
 import Koa from "koa";
 import { ParsedUrlQuery } from "querystring";
 import { HTTPRedirect } from "@larner.dev/http-codes";
+import { ReadStream } from "fs";
 
 type JSONPrimitive = string | number | boolean | Date | null;
 type JSONObject = { [member: string]: JSONValue };
@@ -17,7 +18,7 @@ export type ParameterizedContext = Koa.ParameterizedContext;
 
 export type HandleRequestFn = (
   ctx: Koa.ParameterizedContext
-) => Promise<unknown>;
+) => Promise<RouteHandlerResult>;
 
 type DeepPartial<T> = T extends object
   ? {
@@ -60,15 +61,20 @@ export interface Context<B = JSONValue> {
   method: Method;
 }
 
-export type RouteHandler<C1 extends Context = Context, C2 = {}> = (
-  context: C1,
-  rawContext: Koa.ParameterizedContext & C2
-) => Promise<JSONValue | HTTPRedirect>;
+export type RouteHandlerResult = JSONValue | HTTPRedirect | ReadStream | void;
 
-export type MiddlewareHandler<C1 extends Context = Context, C2 = {}> = (
+export type RouteHandler<
+  C1 extends Context = Context,
+  C2 = Record<string, unknown>
+> = (
   context: C1,
   rawContext: Koa.ParameterizedContext & C2
-) => Promise<void>;
+) => Promise<RouteHandlerResult>;
+
+export type MiddlewareHandler<
+  C1 extends Context = Context,
+  C2 = Record<string, unknown>
+> = (context: C1, rawContext: Koa.ParameterizedContext & C2) => Promise<void>;
 
 export type Routes<C1 extends Context, C2> =
   | Record<

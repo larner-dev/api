@@ -1,7 +1,6 @@
 import url from "url";
-import Koa from "koa";
 import querystring from "querystring";
-import { HTTPError, HTTPRedirect } from "@larner.dev/http-codes";
+import { HTTPError } from "@larner.dev/http-codes";
 import { Key, pathToRegexp } from "path-to-regexp";
 import { IncomingHttpHeaders } from "http";
 import { configBuilder } from "./configBuilder";
@@ -13,6 +12,7 @@ import {
   Method,
   MethodOrAny,
   RouteHandler,
+  RouteHandlerResult,
   StringValueObject,
   ValidatedConfig,
 } from "./types";
@@ -123,7 +123,7 @@ export const bootstrap = async <T extends Context>(
   }
 
   return {
-    async handleRequest(ctx: Koa.ParameterizedContext): Promise<unknown> {
+    async handleRequest(ctx) {
       const method = ctx.request.method as Method;
       const requestUrl = ctx.request.url;
       const body = ctx.request.body as JSONValue;
@@ -156,7 +156,7 @@ export const bootstrap = async <T extends Context>(
           headers,
           method,
         };
-        let result: JSONValue | HTTPRedirect = null;
+        let result: RouteHandlerResult = null;
 
         for (const fn of matchedRoute.middleware) {
           result = await fn(context as T, ctx);

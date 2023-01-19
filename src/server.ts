@@ -38,7 +38,7 @@ export const server = async <T extends Context = Context>(
       } else if (result instanceof ReadStream) {
         ctx.type = contentType(basename(result.path.toString())) || "";
         ctx.body = result;
-      } else {
+      } else if (result) {
         ctx.body = result;
       }
     } catch (error) {
