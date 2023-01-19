@@ -11,6 +11,7 @@ import {
   HandleRequestFn,
   JSONValue,
   Method,
+  MethodOrAny,
   RouteHandler,
   StringValueObject,
   ValidatedConfig,
@@ -25,7 +26,7 @@ interface Bootstrap {
 }
 
 interface RouteMetadata<T extends Context = Context> {
-  method: Method;
+  method: MethodOrAny;
   pattern: string;
   keys: Key[];
   regexp: RegExp;
@@ -80,7 +81,9 @@ export const bootstrap = async <T extends Context>(
       );
       for (const key of keys) {
         const [method, subPattern] = key.split(" ");
-        if (!["GET", "POST", "PUT", "PATCH", "DELETE"].includes(method)) {
+        if (
+          !["GET", "POST", "PUT", "PATCH", "DELETE", "ANY"].includes(method)
+        ) {
           throw new Error(
             `Endpoint "${key}" in route "${routePath}" does not start with a valid request type (GET, POST, PUT, PATCH or DELETE)`
           );
@@ -108,7 +111,7 @@ export const bootstrap = async <T extends Context>(
           ? endpoints[key]
           : [endpoints[key]];
         routes.push({
-          method: method as Method,
+          method: method as MethodOrAny,
           pattern,
           regexp,
           keys,
@@ -132,7 +135,7 @@ export const bootstrap = async <T extends Context>(
       let match: RegExpExecArray | null = null;
 
       for (const route of routes) {
-        if (route.method === method.toUpperCase()) {
+        if (route.method === "ANY" || route.method === method.toUpperCase()) {
           match = route.regexp.exec(pathname || "");
           if (match) {
             matchedRoute = route;
@@ -151,6 +154,7 @@ export const bootstrap = async <T extends Context>(
           body,
           rawBody,
           headers,
+          method,
         };
         let result: JSONValue | HTTPRedirect = null;
 

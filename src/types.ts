@@ -49,6 +49,7 @@ export interface Config
 }
 
 export type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+export type MethodOrAny = Method | "ANY";
 
 export interface Context<B = JSONValue> {
   query: ParsedUrlQuery;
@@ -56,6 +57,7 @@ export interface Context<B = JSONValue> {
   body: B;
   headers: IncomingHttpHeaders;
   rawBody: string;
+  method: Method;
 }
 
 export type RouteHandler<C1 extends Context = Context, C2 = {}> = (
@@ -69,7 +71,11 @@ export type MiddlewareHandler<C1 extends Context = Context, C2 = {}> = (
 ) => Promise<void>;
 
 export type Routes<C1 extends Context, C2> =
-  | Record<string, RouteHandler<C1, C2>>
+  | Record<
+      string,
+      | RouteHandler<C1, C2>
+      | (RouteHandler<C1, C2> | MiddlewareHandler<C1, C2>)[]
+    >
   | Record<"middleware", MiddlewareHandler<C1, C2>[]>
   | Record<"prefix", string>
   | Record<"suffix", string>;
