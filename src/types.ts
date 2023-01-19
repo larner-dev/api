@@ -84,4 +84,5 @@ export type Routes<C1 extends Context, C2> =
     >
   | Record<"middleware", MiddlewareHandler<C1, C2>[]>
   | Record<"prefix", string>
-  | Record<"suffix", string>;
+  | Record<"suffix", string>
+  | Record<"priority", number>;

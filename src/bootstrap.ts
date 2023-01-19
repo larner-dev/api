@@ -32,6 +32,7 @@ interface RouteMetadata<T extends Context = Context> {
   regexp: RegExp;
   fns: RouteHandler<T>[];
   middleware: RouteHandler<T>[];
+  priority?: number;
 }
 
 export const bootstrap = async <T extends Context>(
@@ -76,8 +77,9 @@ export const bootstrap = async <T extends Context>(
       const middleware = endpoints.middleware || [];
       const endpointsPrefix = endpoints.prefix || "";
       const endpointsSuffix = endpoints.suffix || "";
+      const priority = endpoints.priority;
       const keys = Object.keys(endpoints).filter(
-        (k) => !["middleware", "prefix", "suffix"].includes(k)
+        (k) => !["middleware", "prefix", "suffix", "priority"].includes(k)
       );
       for (const key of keys) {
         const [method, subPattern] = key.split(" ");
@@ -117,8 +119,21 @@ export const bootstrap = async <T extends Context>(
           keys,
           fns,
           middleware,
+          priority,
         });
       }
+      routes.sort((a, b) => {
+        if (a.priority === b.priority) {
+          return 0;
+        }
+        if (a.priority === undefined) {
+          return 1;
+        }
+        if (b.priority === undefined) {
+          return -1;
+        }
+        return a.priority < b.priority ? -1 : 1;
+      });
     }
   }
 
