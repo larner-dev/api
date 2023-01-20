@@ -170,6 +170,8 @@ export const bootstrap = async <T extends Context>(
           rawBody,
           headers,
           method,
+          ip: ctx.ip,
+          ips: ctx.ips,
         };
         let result: RouteHandlerResult = null;
 

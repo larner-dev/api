@@ -58,6 +58,9 @@ export const server = async <T extends Context = Context>(
           // eslint-disable-next-line no-console
           console.error(error);
         }
+        if (validatedConfig.server.errorHandler) {
+          validatedConfig.server.errorHandler(error);
+        }
         ctx.response.status = 500;
         ctx.body = { code: "INTERNAL_SERVER_ERROR" };
       }

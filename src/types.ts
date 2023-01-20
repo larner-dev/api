@@ -41,6 +41,7 @@ export interface ValidatedConfig {
     debug?: boolean;
     port: number;
     index: string;
+    errorHandler?: (error: unknown) => void;
   };
 }
 
@@ -59,6 +60,8 @@ export interface Context<B = JSONValue> {
   headers: IncomingHttpHeaders;
   rawBody: string;
   method: Method;
+  ip: string;
+  ips: string[];
 }
 
 export type RouteHandlerResult = JSONValue | HTTPRedirect | ReadStream | void;
