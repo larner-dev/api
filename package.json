@@ -1,7 +1,7 @@
 {
   "name": "@larner.dev/api",
   "description": "A larner.dev project",
-  "version": "1.9.2",
+  "version": "1.9.3",
   "author": "Aaron Larner",
   "type": "module",
   "scripts": {
