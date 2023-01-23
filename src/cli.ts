@@ -13,6 +13,7 @@ program
   .command("build")
   .description("Build typescript files")
   .argument("<srcDir>", "Source directory for your project")
+  .option("-w, --watch", "Watch mode: rebuild on file system changes")
   .action((str) => {
     build(str);
   });

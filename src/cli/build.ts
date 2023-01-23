@@ -2,6 +2,10 @@ import esbuild from "esbuild";
 import { resolve } from "path";
 import { readdir } from "fs/promises";
 
+interface Options {
+  watch: boolean;
+}
+
 const getFiles = async (dir: string) => {
   const dirents = await readdir(dir, { withFileTypes: true });
   const files = await Promise.all(
@@ -13,7 +17,10 @@ const getFiles = async (dir: string) => {
   return Array.prototype.concat(...files);
 };
 
-export const build = async (srcDir: string): Promise<void> => {
+export const build = async (
+  srcDir: string,
+  { watch }: Options
+): Promise<void> => {
   const entryPoints = (await getFiles(srcDir)).filter(
     (p) => !p.endsWith(".test.ts")
   );
@@ -27,6 +34,7 @@ export const build = async (srcDir: string): Promise<void> => {
     target: "node16",
     format: "esm",
     packages: "external",
+    watch,
     plugins: [
       {
         name: "alias",
