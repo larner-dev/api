@@ -4,31 +4,31 @@ import { Config, StringValueObject, JSONValue, HandleRequestFn } from "./types";
 import { createMockContext } from "./createMockContext";
 
 export interface TestHelpers {
-  get: (
+  get: <T = unknown>(
     path: string,
     query?: StringValueObject,
     headers?: StringValueObject
-  ) => Promise<unknown>;
-  post: (
+  ) => Promise<T>;
+  post: <T = unknown>(
     path: string,
     body?: JSONValue,
     headers?: StringValueObject
-  ) => Promise<unknown>;
-  put: (
+  ) => Promise<T>;
+  put: <T = unknown>(
     path: string,
     body?: JSONValue,
     headers?: StringValueObject
-  ) => Promise<unknown>;
-  patch: (
+  ) => Promise<T>;
+  patch: <T = unknown>(
     path: string,
     body?: JSONValue,
     headers?: StringValueObject
-  ) => Promise<unknown>;
-  delete: (
+  ) => Promise<T>;
+  delete: <T = unknown>(
     path: string,
     body?: JSONValue,
     headers?: StringValueObject
-  ) => Promise<unknown>;
+  ) => Promise<T>;
   handleRequest: HandleRequestFn;
 }
 
@@ -37,11 +37,11 @@ export const bootstrapTests = async (config: Config): Promise<TestHelpers> => {
 
   return {
     handleRequest,
-    async get(
+    async get<T = unknown>(
       path: string,
       query: StringValueObject = {},
       headers: StringValueObject = {}
-    ): Promise<unknown> {
+    ): Promise<T> {
       const url = new URL(path, "http://localhost");
       url.search = querystring.stringify(query);
       const result = await handleRequest(
@@ -53,11 +53,11 @@ export const bootstrapTests = async (config: Config): Promise<TestHelpers> => {
       );
       return JSON.parse(JSON.stringify(result));
     },
-    async post(
+    async post<T = unknown>(
       path: string,
       body: JSONValue = {},
       headers: StringValueObject = {}
-    ): Promise<unknown> {
+    ): Promise<T> {
       const url = new URL(path, "http://localhost");
       const result = await handleRequest(
         createMockContext({
@@ -70,11 +70,11 @@ export const bootstrapTests = async (config: Config): Promise<TestHelpers> => {
       );
       return JSON.parse(JSON.stringify(result));
     },
-    async put(
+    async put<T = unknown>(
       path: string,
       body: JSONValue = {},
       headers: StringValueObject = {}
-    ): Promise<unknown> {
+    ): Promise<T> {
       const url = new URL(path, "http://localhost");
       const result = await handleRequest(
         createMockContext({
@@ -87,11 +87,11 @@ export const bootstrapTests = async (config: Config): Promise<TestHelpers> => {
       );
       return JSON.parse(JSON.stringify(result));
     },
-    async patch(
+    async patch<T = unknown>(
       path: string,
       body: JSONValue = {},
       headers: StringValueObject = {}
-    ): Promise<unknown> {
+    ): Promise<T> {
       const url = new URL(path, "http://localhost");
       const result = await handleRequest(
         createMockContext({
@@ -104,11 +104,11 @@ export const bootstrapTests = async (config: Config): Promise<TestHelpers> => {
       );
       return JSON.parse(JSON.stringify(result));
     },
-    async delete(
+    async delete<T = unknown>(
       path: string,
       body: JSONValue = {},
       headers: StringValueObject = {}
-    ): Promise<unknown> {
+    ): Promise<T> {
       const url = new URL(path, "http://localhost");
       const result = await handleRequest(
         createMockContext({
