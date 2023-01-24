@@ -1,9 +1,9 @@
-import { ParameterizedContext } from "koa";
 import querystring from "querystring";
 import { bootstrap } from "./index";
 import { Config, StringValueObject, JSONValue, HandleRequestFn } from "./types";
+import { createMockContext } from "./createMockContext";
 
-interface TestHelpers {
+export interface TestHelpers {
   get: (
     path: string,
     query?: StringValueObject,
@@ -42,13 +42,15 @@ export const bootstrapTests = async (config: Config): Promise<TestHelpers> => {
       query: StringValueObject = {},
       headers: StringValueObject = {}
     ): Promise<unknown> {
-      const result = await handleRequest({
-        method: "GET",
-        path: `${path}?${querystring.stringify(query)}`,
-        body: {},
-        rawBody: "",
-        headers,
-      } as unknown as ParameterizedContext);
+      const url = new URL(path, "http://localhost");
+      url.search = querystring.stringify(query);
+      const result = await handleRequest(
+        createMockContext({
+          method: "GET",
+          url: url.toString(),
+          headers,
+        })
+      );
       return JSON.parse(JSON.stringify(result));
     },
     async post(
@@ -56,13 +58,16 @@ export const bootstrapTests = async (config: Config): Promise<TestHelpers> => {
       body: JSONValue = {},
       headers: StringValueObject = {}
     ): Promise<unknown> {
-      const result = await handleRequest({
-        method: "POST",
-        path,
-        body,
-        rawBody: JSON.stringify(body),
-        headers,
-      } as unknown as ParameterizedContext);
+      const url = new URL(path, "http://localhost");
+      const result = await handleRequest(
+        createMockContext({
+          method: "POST",
+          url: url.toString(),
+          headers,
+          rawBody: JSON.stringify(body),
+          requestBody: body,
+        })
+      );
       return JSON.parse(JSON.stringify(result));
     },
     async put(
@@ -70,13 +75,16 @@ export const bootstrapTests = async (config: Config): Promise<TestHelpers> => {
       body: JSONValue = {},
       headers: StringValueObject = {}
     ): Promise<unknown> {
-      const result = await handleRequest({
-        method: "PUT",
-        path,
-        body,
-        rawBody: JSON.stringify(body),
-        headers,
-      } as unknown as ParameterizedContext);
+      const url = new URL(path, "http://localhost");
+      const result = await handleRequest(
+        createMockContext({
+          method: "PUT",
+          url: url.toString(),
+          headers,
+          rawBody: JSON.stringify(body),
+          requestBody: body,
+        })
+      );
       return JSON.parse(JSON.stringify(result));
     },
     async patch(
@@ -84,13 +92,16 @@ export const bootstrapTests = async (config: Config): Promise<TestHelpers> => {
       body: JSONValue = {},
       headers: StringValueObject = {}
     ): Promise<unknown> {
-      const result = await handleRequest({
-        method: "PATCH",
-        path,
-        body,
-        rawBody: JSON.stringify(body),
-        headers,
-      } as unknown as ParameterizedContext);
+      const url = new URL(path, "http://localhost");
+      const result = await handleRequest(
+        createMockContext({
+          method: "PATCH",
+          url: url.toString(),
+          headers,
+          rawBody: JSON.stringify(body),
+          requestBody: body,
+        })
+      );
       return JSON.parse(JSON.stringify(result));
     },
     async delete(
@@ -98,13 +109,16 @@ export const bootstrapTests = async (config: Config): Promise<TestHelpers> => {
       body: JSONValue = {},
       headers: StringValueObject = {}
     ): Promise<unknown> {
-      const result = await handleRequest({
-        method: "DELETE",
-        path,
-        body,
-        rawBody: JSON.stringify(body),
-        headers,
-      } as unknown as ParameterizedContext);
+      const url = new URL(path, "http://localhost");
+      const result = await handleRequest(
+        createMockContext({
+          method: "DELETE",
+          url: url.toString(),
+          headers,
+          rawBody: JSON.stringify(body),
+          requestBody: body,
+        })
+      );
       return JSON.parse(JSON.stringify(result));
     },
   };

@@ -25,19 +25,17 @@ interface Bootstrap {
   handleRequest: HandleRequestFn;
 }
 
-interface RouteMetadata<T extends Context = Context> {
+interface RouteMetadata {
   method: MethodOrAny;
   pattern: string;
   keys: Key[];
   regexp: RegExp;
-  fns: RouteHandler<T>[];
-  middleware: RouteHandler<T>[];
+  fns: RouteHandler[];
+  middleware: RouteHandler[];
   priority?: number;
 }
 
-export const bootstrap = async <T extends Context>(
-  config: Config
-): Promise<Bootstrap> => {
+export const bootstrap = async (config: Config): Promise<Bootstrap> => {
   // Validate config and fix paths
   const validatedConfig = configBuilder(config);
 
@@ -60,7 +58,7 @@ export const bootstrap = async <T extends Context>(
     });
   }
 
-  const routes: RouteMetadata<T>[] = [];
+  const routes: RouteMetadata[] = [];
   for (const routePath of routePaths) {
     if (routePath.match("^.+.m?[jt]s")) {
       const route = routePath.substring(
@@ -146,7 +144,7 @@ export const bootstrap = async <T extends Context>(
       const headers: IncomingHttpHeaders = ctx.request.header;
       const { pathname, query } = url.parse(requestUrl);
       const parsedQuery = querystring.parse(query || "");
-      let matchedRoute: RouteMetadata<T> | null = null;
+      let matchedRoute: RouteMetadata | null = null;
       let match: RegExpExecArray | null = null;
 
       for (const route of routes) {
@@ -172,14 +170,15 @@ export const bootstrap = async <T extends Context>(
           method,
           ip: ctx.ip,
           ips: ctx.ips,
+          koaCtx: () => ctx,
         };
         let result: RouteHandlerResult = null;
 
         for (const fn of matchedRoute.middleware) {
-          result = await fn(context as T, ctx);
+          result = await fn(context);
         }
         for (const fn of matchedRoute.fns) {
-          result = await fn(context as T, ctx);
+          result = await fn(context);
         }
         return result;
       } else {

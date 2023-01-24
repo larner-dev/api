@@ -53,7 +53,12 @@ export interface Config
 export type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 export type MethodOrAny = Method | "ANY";
 
-export interface Context<B = JSONValue> {
+type PlainObject = { [key: string]: unknown };
+
+export interface Context<
+  B = JSONValue,
+  K extends PlainObject = Record<string, unknown>
+> {
   query: ParsedUrlQuery;
   params: StringValueObject;
   body: B;
@@ -62,30 +67,24 @@ export interface Context<B = JSONValue> {
   method: Method;
   ip: string;
   ips: string[];
+  koaCtx: () => ParameterizedContext & K;
 }
 
 export type RouteHandlerResult = JSONValue | HTTPRedirect | ReadStream | void;
 
-export type RouteHandler<
-  C1 extends Context = Context,
-  C2 = Record<string, unknown>
-> = (
-  context: C1,
-  rawContext: Koa.ParameterizedContext & C2
-) => Promise<RouteHandlerResult>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type RouteHandler = (context: any) => Promise<RouteHandlerResult>;
 
-export type MiddlewareHandler<
-  C1 extends Context = Context,
-  C2 = Record<string, unknown>
-> = (context: C1, rawContext: Koa.ParameterizedContext & C2) => Promise<void>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type MiddlewareHandler = (context: any) => Promise<void>;
 
-export type Routes<C1 extends Context, C2> =
-  | Record<
-      string,
-      | RouteHandler<C1, C2>
-      | (RouteHandler<C1, C2> | MiddlewareHandler<C1, C2>)[]
-    >
-  | Record<"middleware", MiddlewareHandler<C1, C2>[]>
-  | Record<"prefix", string>
-  | Record<"suffix", string>
-  | Record<"priority", number>;
+export type Routes =
+  | {
+      middleware?: MiddlewareHandler[];
+      prefix?: string;
+      suffix?: string;
+      priority?: number;
+    }
+  | {
+      [key: string]: RouteHandler | (RouteHandler | MiddlewareHandler)[];
+    };

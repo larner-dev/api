@@ -10,7 +10,7 @@ import bodyParser from "koa-bodyparser";
 import { basename } from "path";
 import { Server } from "http";
 
-export const server = async <T extends Context = Context>(
+export const server = async (
   config: Config,
   injectMiddleware?: (app: Koa) => void
 ): Promise<{
@@ -18,7 +18,7 @@ export const server = async <T extends Context = Context>(
   instance: Server;
   config: ValidatedConfig;
 }> => {
-  const { handleRequest, config: validatedConfig } = await bootstrap<T>(config);
+  const { handleRequest, config: validatedConfig } = await bootstrap(config);
 
   // Start the server
   const app = new Koa();
