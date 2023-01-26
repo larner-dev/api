@@ -22,7 +22,7 @@ export const build = async (
   { watch }: Options
 ): Promise<void> => {
   const entryPoints = (await getFiles(srcDir)).filter(
-    (p) => !p.endsWith(".test.ts")
+    (p: string) => p.endsWith(".ts") && !p.endsWith(".test.ts")
   );
   const filter = /.*/;
 

@@ -17,4 +17,5 @@ module.exports = {
   rules: {
     "ban-ts-comment": 0,
   },
+  ignorePatterns: ["build/**/*"],
 };

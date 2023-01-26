@@ -2,11 +2,11 @@
 
 ## Setup
 
-Run `npm install`
+Run `yarn`
 
 ## Commands
 
-Use `npm run` followed by any of these commands:
+Use `yarn` followed by any of these commands:
 
 - `build`: Output both ESM and CJS versions of the project, as well as type definitions to `build` directory.
 - `build-cjs`: Output CJS versions of the project to `build/cjs` directory.
@@ -16,3 +16,4 @@ Use `npm run` followed by any of these commands:
 - `format`: Format all typescript files using prettier.
 - `lint`: Run the linter to check for errors.
 - `test`: Run unit tests.
+- `test-watch`: Run unit tests in watch mode.
