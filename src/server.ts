@@ -53,6 +53,9 @@ export const server = async (
       ) {
         ctx.response.status = error.status;
         ctx.body = { code: error.message };
+        if (error.status >= 500 && validatedConfig.server.errorHandler) {
+          validatedConfig.server.errorHandler(error);
+        }
       } else {
         if (validatedConfig.server.debug) {
           // eslint-disable-next-line no-console
