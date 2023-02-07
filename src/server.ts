@@ -1,12 +1,10 @@
 import Koa from "koa";
 
 import { HTTPRedirect } from "@larner.dev/http-codes";
-import { Config, Context, ValidatedConfig } from "./types";
+import { Config, ValidatedConfig } from "./types";
 import { bootstrap } from "./bootstrap";
 import { ReadStream } from "fs";
 import { contentType } from "mime-types";
-import cors from "@koa/cors";
-import bodyParser from "koa-bodyparser";
 import { basename } from "path";
 import { Server } from "http";
 
@@ -22,10 +20,6 @@ export const server = async (
 
   // Start the server
   const app = new Koa();
-  app.use(bodyParser({ enableTypes: ["json"] }));
-  if (validatedConfig.server.cors) {
-    app.use(cors(validatedConfig.server.cors));
-  }
   if (injectMiddleware) {
     injectMiddleware(app);
   }
@@ -38,7 +32,7 @@ export const server = async (
       } else if (result instanceof ReadStream) {
         ctx.type = contentType(basename(result.path.toString())) || "";
         ctx.body = result;
-      } else if (result) {
+      } else if (result !== undefined) {
         ctx.body = result;
       }
     } catch (error) {
